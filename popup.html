@@ -2,34 +2,41 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>SkySniper — Dashboard</title>
+  <title>SkySniper — Control Panel</title>
   <link rel="stylesheet" href="popup.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="popup-container">
     <h1>🚀 SkySniper</h1>
-    <p class="subtitle">Odds96 Aviator Sniper Toolkit</p>
+    <p class="subtitle">Odds96 Aviator Toolkit</p>
 
-    <div class="panel">
-      <h2>📊 Pattern Scanner</h2>
-      <p id="pattern-insights">Loading last 500 rounds...</p>
+    <div class="tabs">
+      <button class="tab active" data-tab="pattern">📊 Pattern</button>
+      <button class="tab" data-tab="ai">🤖 AI</button>
+      <button class="tab" data-tab="hash">🔐 Hash</button>
+      <button class="tab" data-tab="auto">🛑 Auto</button>
     </div>
 
-    <div class="panel">
+    <div class="tab-content active" id="pattern">
+      <h2>📊 Pattern Scanner</h2>
+      <p id="pattern-insights">Loading last 10 rounds...</p>
+    </div>
+
+    <div class="tab-content" id="ai">
       <h2>🤖 AI Prediction</h2>
       <p>Next Multiplier: <span id="ai-result">--</span></p>
       <p>Confidence: <span id="ai-confidence">--%</span></p>
     </div>
 
-    <div class="panel">
+    <div class="tab-content" id="hash">
       <h2>🔐 Hash Verifier</h2>
       <input type="text" id="hashInput" placeholder="Paste server seed or hash..." />
       <button id="verifyHash">Verify</button>
       <p id="hashStatus">Waiting...</p>
     </div>
 
-    <div class="panel">
+    <div class="tab-content" id="auto">
       <h2>🛑 Auto Cashout</h2>
       <label for="multInput">Threshold:</label>
       <input type="number" id="multInput" min="1.00" max="10.00" step="0.01" value="1.45" />
@@ -38,9 +45,10 @@
     </div>
 
     <footer>
-      <p>Made for Honey 💻 | v1.0 | SkySniper Elite</p>
+      <p>Made for Honey 🔥 | v2.0 | SkySniper Elite</p>
     </footer>
   </div>
-  <script src="popup.js"></script>
+
+  <script type="module" src="popup.js"></script>
 </body>
 </html>
