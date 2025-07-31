@@ -65,21 +65,4 @@ function interceptWebSocket(wsUrl) {
     console.log("🔌 SkySniper socket closed");
     socketIntercepted = false;
   };
-}          ].slice(-500); // Keep only last 500
-
-          chrome.storage.local.set({ aviatorRounds: updated });
-        });
-      }
-    } catch (err) {
-      console.error("🛑 Message parse failed:", err);
-    }
-  };
-
-  socket.onerror = (e) => {
-    console.warn("⚠️ WebSocket error:", e);
-  };
-
-  socket.onclose = () => {
-    console.log("🔌 SkySniper socket closed");
-  };
 }
