@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "SkySniper — Odds96 Aviator Assistant",
+  "description": "Aviator prediction & sniping toolkit with AI insights, pattern scanner, hash audit & auto cashout — all in one sleek popup dashboard.",
+  "version": "1.0.0",
+  "action": {
+    "default_icon": {
+      "128": "assets/icon128.png"
+    },
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "scripting",
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "*://*.odds96.*/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["*://*.odds96.*/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "icons": {
+    "128": "assets/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["assets/*"],
+      "matches": ["*://*.odds96.*/*"]
+    }
+  ]
+}
