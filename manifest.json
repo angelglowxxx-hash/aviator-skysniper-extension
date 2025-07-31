@@ -1,38 +1,64 @@
 {
   "manifest_version": 3,
-  "name": "SkySniper — Odds96 Aviator Assistant",
-  "description": "Aviator prediction & sniping toolkit with AI insights, pattern scanner, hash audit & auto cashout — all in one sleek popup dashboard.",
-  "version": "1.0.0",
-  "action": {
-    "default_icon": {
-      "128": "assets/icon128.png"
-    },
-    "default_popup": "popup.html"
-  },
+  "name": "SkySniper",
+  "version": "2.0",
+  "description": "Exclusive Aviator prediction & analytics toolkit",
+  "permissions": [
+    "storage",
+    "scripting",
+    "activeTab"
+  ],
+  "optional_permissions": [
+    "clipboardWrite",
+    "notifications",
+    "downloads"
+  ],
+  "host_permissions": [
+    "*://*.odds96.com/*",
+    "*://*.aviatorgame.com/*"
+  ],
   "background": {
     "service_worker": "background.js"
   },
-  "permissions": [
-    "scripting",
-    "storage",
-    "activeTab"
-  ],
-  "host_permissions": [
-    "*://*.odds96.*/*"
-  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
   "content_scripts": [
     {
-      "matches": ["*://*.odds96.*/*"],
+      "matches": ["*://*.odds96.com/*"],
       "js": ["content.js"]
     }
   ],
-  "icons": {
-    "128": "assets/icon128.png"
-  },
   "web_accessible_resources": [
     {
-      "resources": ["assets/*"],
-      "matches": ["*://*.odds96.*/*"]
+      "resources": [
+        "overlay.css",
+        "sniperOverlay.js"
+      ],
+      "matches": ["*://*.odds96.com/*"]
     }
-  ]
+  ],
+  "commands": {
+    "toggle-sniper": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+S"
+      },
+      "description": "Toggle sniper overlay"
+    },
+    "open-popup": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+P"
+      },
+      "description": "Open SkySniper popup"
+    }
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src https://your-replit-api.repl.co"
+  }
+}  ]
 }
