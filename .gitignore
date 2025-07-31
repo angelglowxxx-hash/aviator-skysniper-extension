@@ -1,0 +1,37 @@
+# Node modules (if you use Node.js for backend or testing)
+node_modules/
+
+# Replit config files
+.replit
+*.replit
+
+# OS-specific junk
+.DS_Store
+Thumbs.db
+
+# Logs & temp
+*.log
+*.tmp
+
+# Build artifacts
+dist/
+build/
+*.zip
+
+# API keys or secrets (if any)
+.env
+.env.local
+.env.production
+
+# Extension packaging
+*.crx
+*.pem
+
+# IDE configs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Optional: ignore test data
+data/dummyRounds.json
