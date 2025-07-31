@@ -1,35 +1,110 @@
-// SkySniper — aiPredictor.js v2.0
+/* SkySniper — popup.css v2.0 */
 
-const MODEL_ENDPOINTS = {
-  basic: "https://your-basic-model.replit.app/predict",
-  advanced: "https://your-advanced-model.replit.app/predict"
-};
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: #0d0d0d;
+  color: #ffffff;
+  padding: 16px;
+  width: 320px;
+  box-sizing: border-box;
+}
 
-// 🧠 Fetch prediction from selected model
-export async function fetchAviatorPrediction(model = "basic") {
-  const endpoint = MODEL_ENDPOINTS[model] || MODEL_ENDPOINTS.basic;
+.popup-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
 
-  try {
-    const response = await fetch(endpoint);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+/* Header */
+h1 {
+  font-size: 1.6em;
+  color: #e50914;
+  margin-bottom: 4px;
+}
 
-    const { predicted, confidence } = await response.json();
+.subtitle {
+  font-size: 0.9em;
+  color: #bbbbbb;
+  margin-bottom: 12px;
+}
 
-    return {
-      predicted: `${predicted}x`,
-      confidence: `${confidence}%`,
-      raw: { predicted, confidence },
-      model,
-      error: false
-    };
-  } catch (error) {
-    console.warn(`❌ AI Predictor (${model}) failed:`, error);
-    return {
-      predicted: "Unavailable",
-      confidence: "--%",
-      raw: null,
-      model,
-      error: true
-    };
-  }
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.tab {
+  flex: 1;
+  background-color: #1a1a1a;
+  color: #ffffff;
+  border: 1px solid #333;
+  padding: 6px;
+  font-size: 0.85em;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.tab:hover {
+  background-color: #2a2a2a;
+}
+
+.tab.active {
+  background-color: #e50914;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Tab Content Panels */
+.tab-content {
+  display: none;
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  border-left: 4px solid #e50914;
+  padding: 12px;
+  border-radius: 6px;
+  box-shadow: 0 0 4px rgba(255, 0, 0, 0.2);
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Inputs & Buttons */
+input[type="text"],
+input[type="number"] {
+  width: 100%;
+  padding: 6px 10px;
+  font-size: 0.9em;
+  border: none;
+  border-radius: 4px;
+  background-color: #262626;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+button {
+  background-color: #e50914;
+  color: #ffffff;
+  border: none;
+  padding: 8px 12px;
+  font-size: 0.9em;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background-color: #ff2020;
+}
+
+/* Footer */
+footer {
+  font-size: 0.8em;
+  color: #666;
+  text-align: center;
+  margin-top: 12px;
 }
