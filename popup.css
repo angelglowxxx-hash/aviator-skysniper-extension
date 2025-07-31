@@ -1,4 +1,5 @@
-/* SkySniper — popup.css */
+/* SkySniper — popup.css v2.0 */
+
 body {
   margin: 0;
   font-family: 'Poppins', sans-serif;
@@ -15,6 +16,7 @@ body {
   gap: 16px;
 }
 
+/* Header */
 h1 {
   font-size: 1.6em;
   color: #e50914;
@@ -27,7 +29,38 @@ h1 {
   margin-bottom: 12px;
 }
 
-.panel {
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.tab {
+  flex: 1;
+  background-color: #1a1a1a;
+  color: #ffffff;
+  border: 1px solid #333;
+  padding: 6px;
+  font-size: 0.85em;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.tab:hover {
+  background-color: #2a2a2a;
+}
+
+.tab.active {
+  background-color: #e50914;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Tab Content Panels */
+.tab-content {
+  display: none;
   background-color: #1a1a1a;
   border: 1px solid #333;
   border-left: 4px solid #e50914;
@@ -36,12 +69,11 @@ h1 {
   box-shadow: 0 0 4px rgba(255, 0, 0, 0.2);
 }
 
-.panel h2 {
-  margin: 0 0 8px;
-  font-size: 1em;
-  color: #ff3c3c;
+.tab-content.active {
+  display: block;
 }
 
+/* Inputs & Buttons */
 input[type="text"],
 input[type="number"] {
   width: 100%;
@@ -69,6 +101,7 @@ button:hover {
   background-color: #ff2020;
 }
 
+/* Footer */
 footer {
   font-size: 0.8em;
   color: #666;
