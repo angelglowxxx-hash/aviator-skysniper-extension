@@ -1,4 +1,6 @@
-// SkySniper WebSocket Sniffer — background.js
+// SkySniper — background.js (Upgraded)
+
+import { saveRound, tagRoundPattern } from './utils/dbHandler.js';
 
 let socketIntercepted = false;
 
@@ -18,23 +20,52 @@ function interceptWebSocket(wsUrl) {
   const socket = new WebSocket(wsUrl);
 
   socket.onopen = () => {
-    console.log("🚀 SkySniper connected to Aviator socket:", wsUrl);
+    console.log("🚀 SkySniper connected:", wsUrl);
   };
 
-  socket.onmessage = (event) => {
+  socket.onmessage = async (event) => {
     try {
       const data = JSON.parse(event.data);
 
-      if (data && data.type === "game_info") {
+      if (data?.type === "game_info") {
         const { round_id, crash_multiplier, timestamp } = data;
-        console.log("🎯 Round captured:", round_id, "Mult:", crash_multiplier);
 
-        // Store in local storage
-        chrome.storage.local.get({ aviatorRounds: [] }, (res) => {
-          const updated = [
-            ...res.aviatorRounds,
-            { round_id, crash_multiplier, timestamp }
-          ].slice(-500); // Keep only last 500
+        // 🧠 Tag round pattern
+        const tag = tagRoundPattern(crash_multiplier); // e.g. "safe", "volatile", "risky"
+
+        const roundData = {
+          round_id,
+          crash_multiplier,
+          timestamp,
+          tag
+        };
+
+        // 💾 Save locally
+        saveRound(roundData);
+
+        // ☁️ Optional: Sync to cloud
+        // await fetch("https://your-replit-db.repl.co/log", {
+        //   method: "POST",
+        //   headers: { "Content-Type": "application/json" },
+        //   body: JSON.stringify(roundData)
+        // });
+
+        console.log(`🎯 Round ${round_id} logged: ${crash_multiplier}x [${tag}]`);
+      }
+    } catch (err) {
+      console.warn("🛑 WebSocket parse error:", err);
+    }
+  };
+
+  socket.onerror = (e) => {
+    console.warn("⚠️ WebSocket error:", e);
+  };
+
+  socket.onclose = () => {
+    console.log("🔌 SkySniper socket closed");
+    socketIntercepted = false;
+  };
+}          ].slice(-500); // Keep only last 500
 
           chrome.storage.local.set({ aviatorRounds: updated });
         });
