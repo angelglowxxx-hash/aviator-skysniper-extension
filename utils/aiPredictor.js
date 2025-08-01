@@ -1,9 +1,6 @@
 // SkySniper — aiPredictor.js v2.0
 
-const MODEL_ENDPOINTS = {
-  basic: "https://your-basic-model.replit.app/predict",
-  advanced: "https://your-advanced-model.replit.app/predict"
-};
+const MODEL_ENDPOINT = "https://343c884c-eb55-4d6f-99e6-e2a6f98a076c-00-1luyexkeoryzl.pike.replit.dev/predict";
 
 // 🧠 Fetch prediction from selected model
 export async function fetchAviatorPrediction(model = "basic") {
