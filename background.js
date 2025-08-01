@@ -1,68 +1,56 @@
-// SkySniper — background.js (Upgraded)
+// SkySniper — background.js v3.0
+// 🧠 Handles hash capture, decode, AI prediction, Supabase sync
 
-import { saveRound, tagRoundPattern } from './utils/dbHandler.js';
+import { verifyHash } from './utils/hashVerifier.js';
+import { getMultiplierPrediction } from './utils/aiPredictor.js';
+import { addRound, triggerCloudSync } from './utils/dbHandler.js';
+import { checkBackendStatus } from './utils/statusCheck.js';
 
-let socketIntercepted = false;
+// 🔁 Listen for messages from content, popup, or extension
+chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
+  // 🔐 Hash captured from WebSocket
+  if (msg.type === "HASH_CAPTURED" && msg.hash) {
+    console.log("📡 Hash received:", msg.hash);
 
-chrome.webRequest.onBeforeRequest.addListener(
-  function(details) {
-    const url = details.url;
-    if (url.includes("wss") && !socketIntercepted) {
-      socketIntercepted = true;
-      interceptWebSocket(url);
-    }
-  },
-  { urls: ["<all_urls>"] },
-  ["blocking"]
-);
+    const decoded = await verifyHash(msg.hash);
 
-function interceptWebSocket(wsUrl) {
-  const socket = new WebSocket(wsUrl);
+    chrome.runtime.sendMessage({
+      type: "HASH_DECODED",
+      result: decoded,
+      originalHash: msg.hash
+    });
+  }
 
-  socket.onopen = () => {
-    console.log("🚀 SkySniper connected:", wsUrl);
-  };
+  // 🧠 Predict next multiplier using AI
+  if (msg.type === "PREDICT_NEXT" && msg.latestMultiplier) {
+    const prediction = await getMultiplierPrediction(msg.latestMultiplier);
 
-  socket.onmessage = async (event) => {
-    try {
-      const data = JSON.parse(event.data);
+    chrome.runtime.sendMessage({
+      type: "AI_PREDICTION",
+      prediction
+    });
+  }
 
-      if (data?.type === "game_info") {
-        const { round_id, crash_multiplier, timestamp } = data;
+  // 📦 Add round to local buffer
+  if (msg.type === "ROUND_CAPTURED" && msg.round) {
+    addRound(msg.round);
+  }
 
-        // 🧠 Tag round pattern
-        const tag = tagRoundPattern(crash_multiplier); // e.g. "safe", "volatile", "risky"
+  // ☁️ Trigger Supabase sync
+  if (msg.type === "TRIGGER_CLOUD_SYNC") {
+    const success = await triggerCloudSync();
+    chrome.runtime.sendMessage({
+      type: "SYNC_STATUS",
+      success
+    });
+  }
 
-        const roundData = {
-          round_id,
-          crash_multiplier,
-          timestamp,
-          tag
-        };
-
-        // 💾 Save locally
-        saveRound(roundData);
-
-        // ☁️ Optional: Sync to cloud
-        // await fetch("https://your-replit-db.repl.co/log", {
-        //   method: "POST",
-        //   headers: { "Content-Type": "application/json" },
-        //   body: JSON.stringify(roundData)
-        // });
-
-        console.log(`🎯 Round ${round_id} logged: ${crash_multiplier}x [${tag}]`);
-      }
-    } catch (err) {
-      console.warn("🛑 WebSocket parse error:", err);
-    }
-  };
-
-  socket.onerror = (e) => {
-    console.warn("⚠️ WebSocket error:", e);
-  };
-
-  socket.onclose = () => {
-    console.log("🔌 SkySniper socket closed");
-    socketIntercepted = false;
-  };
-}
+  // 🛡️ Backend health check
+  if (msg.type === "CHECK_STATUS") {
+    const status = await checkBackendStatus();
+    chrome.runtime.sendMessage({
+      type: "STATUS_RESULT",
+      status
+    });
+  }
+});
