@@ -33,4 +33,11 @@ export async function getMultiplierPrediction(latestMultiplier = 1.45) {
       console.log("🔮 AI Prediction:", prediction);
       return prediction;
     } else {
-      console.warn("⚠️ No prediction returned
+      console.warn("⚠️ No prediction returned:", data);
+      return "Prediction unavailable";
+    }
+  } catch (err) {
+    console.error("❌ AI prediction failed:", err.message);
+    return "Error fetching prediction";
+  }
+}
