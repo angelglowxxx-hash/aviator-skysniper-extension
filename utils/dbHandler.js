@@ -1,19 +1,20 @@
-// SkySniper — dbHandler.js v2.0
-
 const ROUND_KEY = "aviatorRounds";
 const CASHOUT_KEY = "cashoutThreshold";
+
+// 🔗 Default Replit Sync Endpoint
+const SYNC_ENDPOINT = "https://343c884c-eb55-4d6f-99e6-e2a6f98a076c-00-1luyexkeoryzl.pike.replit.dev/sync";
 
 // 🧩 Save a new round with tagging and size limit
 export async function saveRound(roundData) {
   return new Promise(resolve => {
     chrome.storage.local.get({ [ROUND_KEY]: [] }, res => {
-      // Tag round pattern
       const tag = tagRoundPattern(roundData.crash_multiplier);
       const entry = { ...roundData, tag };
-
-      // Keep only last 500 rounds
       const updated = [...res[ROUND_KEY], entry].slice(-500);
-      chrome.storage.local.set({ [ROUND_KEY]: updated }, () => resolve());
+      chrome.storage.local.set({ [ROUND_KEY]: updated }, async () => {
+        await triggerCloudSync(); // 🔥 Auto sync after save
+        resolve();
+      });
     });
   });
 }
@@ -61,7 +62,7 @@ export async function exportRoundsToCSV() {
   return header + rows;
 }
 
-// ☁️ Optional: Sync rounds to cloud (Replit/Firebase)
+// ☁️ Sync rounds to cloud (Replit)
 export async function syncRoundsToCloud(endpointUrl) {
   const rounds = await loadRecentRounds(500);
   try {
@@ -74,5 +75,15 @@ export async function syncRoundsToCloud(endpointUrl) {
   } catch (err) {
     console.warn("⚠️ Cloud sync failed:", err);
     return false;
+  }
+}
+
+// 🚀 Trigger sync using default Replit endpoint
+export async function triggerCloudSync() {
+  const success = await syncRoundsToCloud(SYNC_ENDPOINT);
+  if (success) {
+    console.log("✅ Rounds synced to cloud");
+  } else {
+    console.warn("❌ Sync failed");
   }
 }
