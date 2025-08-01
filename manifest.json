@@ -1,64 +1,48 @@
 {
   "manifest_version": 3,
-  "name": "SkySniper",
-  "version": "2.0",
-  "description": "Exclusive Aviator prediction & analytics toolkit",
-  "permissions": [
-    "storage",
-    "scripting",
-    "activeTab"
-  ],
-  "optional_permissions": [
-    "clipboardWrite",
-    "notifications",
-    "downloads"
-  ],
-  "host_permissions": [
-    "*://*.odds96.com/*",
-    "*://*.aviatorgame.com/*"
-  ],
-  "background": {
-  "service_worker": "background.js",
-  "type": "module"
-  },
+  "name": "SkySniper Extension",
+  "description": "Crash game sniper with AI prediction, hash decode, and Supabase sync.",
+  "version": "3.0",
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "icons/icon16.png",
-      "48": "icons/icon48.png",
-      "128": "icons/icon128.png"
+      "16": "assets/icon16.png",
+      "48": "assets/icon48.png",
+      "128": "assets/icon128.png"
     }
+  },
+  "background": {
+    "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["*://*.odds96.com/*"],
-      "js": ["content.js"]
+      "matches": ["https://*.aviatorgame.com/*", "https://*.odds96.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_start"
     }
   ],
+  "permissions": [
+    "storage",
+    "webRequest",
+    "webRequestBlocking",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://aviator-skysniper-extension.onrender.com/*",
+    "https://openrouter.ai/*",
+    "https://eipwtuojyimfisucaxnv.supabase.co/*",
+    "https://*.aviatorgame.com/*",
+    "https://*.odds96.com/*"
+  ],
+  "icons": {
+    "16": "assets/icon16.png",
+    "48": "assets/icon48.png",
+    "128": "assets/icon128.png"
+  },
   "web_accessible_resources": [
     {
-      "resources": [
-        "overlay.css",
-        "sniperOverlay.js"
-      ],
-      "matches": ["*://*.odds96.com/*"]
+      "resources": ["assets/*"],
+      "matches": ["<all_urls>"]
     }
-  ],
-  "commands": {
-    "toggle-sniper": {
-      "suggested_key": {
-        "default": "Ctrl+Shift+S"
-      },
-      "description": "Toggle sniper overlay"
-    },
-    "open-popup": {
-      "suggested_key": {
-        "default": "Ctrl+Shift+P"
-      },
-      "description": "Open SkySniper popup"
-    }
-  },
-  "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; connect-src https://343c884c-eb55-4d6f-99e6-e2a6f98a076c-00-1luyexkeoryzl.pike.replit.dev/"
-  }
+  ]
 }
