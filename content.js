@@ -1,72 +1,35 @@
-// SkySniper — content.js (Upgraded)
+// SkySniper — content.js (v2.1)
 
 let triggered = false;
 let threshold = 1.45;
-let lastTriggerTime = null;
 
-// 🧠 Inject floating HUD
-function injectHUD() {
-  const hud = document.createElement('div');
-  hud.id = 'sniper-hud';
-  hud.style.position = 'fixed';
-  hud.style.top = '10px';
-  hud.style.right = '10px';
-  hud.style.background = '#0d0d0d';
-  hud.style.color = '#e50914';
-  hud.style.padding = '8px 12px';
-  hud.style.borderRadius = '6px';
-  hud.style.fontFamily = 'Poppins, sans-serif';
-  hud.style.zIndex = '9999';
-  hud.style.boxShadow = '0 0 8px rgba(255,0,0,0.4)';
-  hud.innerText = `🎯 Target: ${threshold}x`;
-  document.body.appendChild(hud);
-}
+// Load threshold & inject HUD (if using sniperOverlay.js)
+chrome.storage.local.get("cashoutThreshold", (r) => {
+  threshold = r.cashoutThreshold || threshold;
+  // If you’ve injected sniperOverlay.js, it will pick this up
+});
 
-// 🛑 Trigger cashout
-function triggerCashout(mult) {
-  const btn = document.querySelector('.cashout-button, .btn-cashout');
-  if (btn) {
-    btn.click();
+// MutationObserver for auto-cashout
+const observer = new MutationObserver(() => {
+  const el = document.querySelector(".crash__graph__value");
+  const mult = parseFloat(el?.textContent?.replace("x", "") || 0);
+
+  if (!triggered && mult >= threshold) {
+    document.querySelector(".cashout-button")?.click();
     triggered = true;
-    lastTriggerTime = Date.now();
     console.log(`🛑 Auto cashout at ${mult}x`);
   }
-}
 
-// 🔄 Load threshold from storage
-chrome.storage.local.get('cashoutThreshold', (res) => {
-  threshold = res.cashoutThreshold || 1.45;
-  injectHUD();
+  // Reset each round
+  setTimeout(() => (triggered = false), 10000);
 });
 
-// 👀 Observe multiplier changes
-const observer = new MutationObserver(() => {
-  try {
-    const el = document.querySelector('.crash__graph__value');
-    if (el) {
-      const text = el.textContent.replace('x', '');
-      const currentMult = parseFloat(text);
+observer.observe(document.body, { childList: true, subtree: true });
 
-      // Update HUD live
-      const hud = document.getElementById('sniper-hud');
-      if (hud) hud.innerText = `🎯 Target: ${threshold}x\n📈 Live: ${currentMult}x`;
-
-      // Trigger logic
-      if (!triggered && currentMult >= threshold) {
-        triggerCashout(currentMult);
-      }
-    }
-  } catch (err) {
-    console.warn("⚠️ SkySniper DOM error:", err);
+// Listen for toggle-sniper command to show/hide overlay
+chrome.runtime.onMessage.addListener((msg) => {
+  if (msg.type === "toggle-sniper") {
+    const hud = document.getElementById("sky-sniper-hud");
+    if (hud) hud.style.display = hud.style.display === "none" ? "block" : "none";
   }
 });
-
-observer.observe(document.body, {
-  childList: true,
-  subtree: true
-});
-
-// 🔁 Reset every round
-setInterval(() => {
-  triggered = false;
-}, 10000);
