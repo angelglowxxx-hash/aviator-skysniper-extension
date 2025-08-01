@@ -1,48 +1,32 @@
 {
-  "manifest_version": 3,
   "name": "SkySniper Extension",
-  "description": "Crash game sniper with AI prediction, hash decode, and Supabase sync.",
-  "version": "3.0",
+  "version": "3.0.0",
+  "manifest_version": 3,
+  "description": "Odds96 Aviator hash sniping toolkit",
+  "permissions": [
+    "storage",
+    "scripting",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://*/*"
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "assets/icon16.png",
-      "48": "assets/icon48.png",
-      "128": "assets/icon128.png"
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
     }
   },
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "type": "module"
   },
   "content_scripts": [
     {
-      "matches": ["https://*.aviatorgame.com/*", "https://*.odds96.com/*"],
-      "js": ["content.js"],
-      "run_at": "document_start"
-    }
-  ],
-  "permissions": [
-    "storage",
-    "webRequest",
-    "webRequestBlocking",
-    "scripting"
-  ],
-  "host_permissions": [
-    "https://aviator-skysniper-extension.onrender.com/*",
-    "https://openrouter.ai/*",
-    "https://eipwtuojyimfisucaxnv.supabase.co/*",
-    "https://*.aviatorgame.com/*",
-    "https://*.odds96.com/*"
-  ],
-  "icons": {
-    "16": "assets/icon16.png",
-    "48": "assets/icon48.png",
-    "128": "assets/icon128.png"
-  },
-  "web_accessible_resources": [
-    {
-      "resources": ["assets/*"],
-      "matches": ["<all_urls>"]
+      "matches": ["https://odds96.in/*"],
+      "js": ["content.js"]
     }
   ]
 }
