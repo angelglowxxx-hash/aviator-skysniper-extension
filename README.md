@@ -1,23 +1,87 @@
-# ✈️ SkySniper Extension — Odds96 Aviator Toolkit
+# SkySniper — Odds96 Aviator Sniper Toolkit
 
-The ultimate **Chrome/Kiwi browser extension** designed for crash-style games like Aviator on Odds96. This plug-and-play sniper toolkit tracks patterns, predicts rounds, audits fairness, and helps automate smart exits — all inside a clean popup dashboard.
+[![Version](https://img.shields.io/badge/version-2.0.0-red.svg)](https://github.com/your-username/sky-sniper)  
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)  
+[![Mobile Ready](https://img.shields.io/badge/mobile-ready-green.svg)](https://github.com/your-username/sky-sniper)  
+[![AI Powered](https://img.shields.io/badge/AI-powered-orange.svg)](https://github.com/your-username/sky-sniper)
+
+SkySniper is an exclusive browser extension for Odds96 Aviator, combining real-time crash analytics, AI-driven predictions, provably-fair hash verification, pattern scanning, and auto-cashout—all wrapped in a slick black-red-white UI.
 
 ---
 
-## 🚀 Features
+## Features
 
-🟢 **Live WebSocket Sniffer**  
-Captures real-time multiplier, round ID & crash signals from the Aviator game engine.
+- Real-time WebSocket interception and round logging  
+- Pattern scanner with “safe”, “volatile”, and “risky” tags  
+- AI prediction engine (basic & advanced models)  
+- Provably fair hash verification (online & SHA-256 fallback)  
+- Auto cashout HUD overlay and configurable threshold  
+- CSV export and optional cloud sync of round data  
+- Keyboard shortcuts for toggle and popup  
 
-🤖 **AI-Powered Predictor**  
-Uses last 500+ rounds to forecast upcoming crash risks via Replit-hosted TensorFlow model.
+---
 
-📊 **Pattern Scanner**  
-Generates heatmap & streak analytics from historical round data (local IndexedDB).
+## Installation
 
-🔐 **Provably Fair Audit**  
-SHA256 hash verification module to check tamper-proof game integrity (via server seed & nonce).
+1. Clone or download this repository.  
+2. Open your Chrome/Edge/Firefox (with Chrome-compatible extensions) and navigate to `chrome://extensions`.  
+3. Enable “Developer mode” (top right).  
+4. Click “Load unpacked,” then select the project root folder.  
+5. Ensure the extension icon appears in your toolbar—SkySniper is live!
 
+---
+
+## Usage
+
+1. Navigate to an Odds96 Aviator game page.  
+2. Click the SkySniper icon or press `Ctrl+Shift+P` to open the dashboard.  
+3.  
+   - In **Pattern** tab, view the last 10 crash multipliers.  
+   - In **AI** tab, see next-round prediction and confidence.  
+   - In **Hash** tab, paste the server seed or hash to verify fairness.  
+   - In **Auto** tab, set your cashout multiplier; HUD overlay will auto-trigger.  
+4. Press `Ctrl+Shift+S` to toggle the on-screen HUD overlay at any time.  
+
+---
+
+## Screenshots & Demo
+
+### Dashboard (Tabbed UI)
+
+![Dashboard Screenshot](assets/screenshots/dashboard.png)
+
+### In-Game HUD Overlay
+
+![HUD Overlay](assets/screenshots/hud-overlay.gif)
+
+---
+
+## Configuration
+
+- API endpoints for prediction and hash verification can be customized in  
+  `utils/aiPredictor.js` and `utils/hashVerifier.js`.  
+- Round logging limit and export options are in `utils/dbHandler.js`.  
+- Toggle optional cloud sync by uncommenting and setting your endpoint in `background.js`.
+
+---
+
+## Contributing
+
+We welcome your ideas, bug reports, and improvements!
+
+1. Fork the repository.  
+2. Create a feature branch (`git checkout -b feature/YourIdea`).  
+3. Commit your changes (`git commit -m "Add amazing new feature"`).  
+4. Push to your branch (`git push origin feature/YourIdea`).  
+5. Open a Pull Request describing your changes.  
+
+Please ensure code follows the existing modular structure, includes documentation, and adds relevant tests or screenshots where applicable.
+
+---
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 🛑 **Auto Cashout Hook**  
 DOM-level script that auto-clicks the cashout button at your configured multiplier.
 
