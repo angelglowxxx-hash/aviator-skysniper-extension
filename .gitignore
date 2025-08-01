@@ -5,23 +5,28 @@ node_modules/
 .replit
 *.replit
 
-# OS-specific junk
+# OS-specific files
 .DS_Store
 Thumbs.db
 
 # Logs & temp
 *.log
 *.tmp
+logs/
 
 # Build artifacts
 dist/
 build/
 *.zip
 
-# API keys or secrets (if any)
+# API keys or secrets
 .env
 .env.local
 .env.production
+.env.secret
+
+# Config folder for future settings
+.config/
 
 # Extension packaging
 *.crx
@@ -33,5 +38,5 @@ build/
 *.sublime-project
 *.sublime-workspace
 
-# Optional: ignore test data
+# Optional: ignore test or dummy data
 data/dummyRounds.json
