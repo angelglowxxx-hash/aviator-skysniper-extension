@@ -1,89 +1,33 @@
+<!-- SkySniper — popup.html v3.0 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>SkySniper — Control Panel</title>
+  <title>SkySniper Extension</title>
   <link rel="stylesheet" href="popup.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <div class="popup-container">
-    <h1>🚀 SkySniper</h1>
-    <p class="subtitle">Odds96 Aviator Toolkit</p>
+  <h1>SkySniper v3.0</h1>
 
-    <div class="tabs">
-      <button class="tab active" data-tab="pattern">📊 Pattern</button>
-      <button class="tab" data-tab="ai">🤖 AI</button>
-      <button class="tab" data-tab="hash">🔐 Hash</button>
-      <button class="tab" data-tab="auto">🛑 Auto</button>
-      <button class="tab" data-tab="analytics">📈 Analytics</button>
-      <button class="tab" data-tab="export">💾 Export</button>
-    </div>
-
-    <div class="tab-content active" id="pattern">
-      <h2>📊 Pattern Scanner</h2>
-      <p id="pattern-insights">Loading last 10 rounds...</p>
-    </div>
-
-    <div class="tab-content" id="ai">
-      <h2>🤖 AI Prediction</h2>
-      <p>Next Multiplier: <span id="ai-result">--</span></p>
-      <p>Confidence: <span id="ai-confidence">--%</span></p>
-    </div>
-
-    <div class="tab-content" id="hash">
-      <h2>🔐 Hash Verifier</h2>
-      <input type="text" id="hashInput" placeholder="Paste server seed or hash..." />
-      <button id="verifyHash">Verify</button>
-      <p id="hashStatus">Waiting...</p>
-    </div>
-
-    <div class="tab-content" id="auto">
-      <h2>🛑 Auto Cashout</h2>
-      <label for="multInput">Threshold:</label>
-      <input type="number" id="multInput" min="1.00" max="10.00" step="0.01" value="1.45" />
-      <button id="setCashout">Apply</button>
-      <p id="cashoutStatus">Not set</p>
-    </div>
-
-    <div class="tab-content" id="analytics">
-      <h2>📈 Crash Analytics</h2>
-      <div id="analytics-stats">
-        <p>Average: <span id="stat-avg">--</span></p>
-        <p>Median: <span id="stat-med">--</span></p>
-        <p>Std Dev: <span id="stat-std">--</span></p>
-        <p>Volatility: <span id="stat-vol">--</span></p>
-        <p>Anomalies: <span id="stat-anom">--</span></p>
-      </div>
-      <canvas id="histogram" width="280" height="120"></canvas>
-    </div>
-
-    <div class="tab-content" id="export">
-      <h2>💾 Export Data</h2>
-      <button id="exportCsvBtn">Export CSV</button>
-      <button id="exportJsonBtn">Export JSON</button>
-    </div>
-
-    <footer>
-      <p>Made for Honey 🔥 | v2.0 | SkySniper Elite</p>
-    </footer>
+  <div class="section">
+    <h2>🔓 Hash Decode</h2>
+    <div id="hashResult">Waiting for hash...</div>
   </div>
 
-  <script type="module" src="popup.js"></script>
-</body>
-</html>    </div>
+  <div class="section">
+    <h2>🔮 AI Prediction</h2>
+    <div id="predictionResult">--</div>
+  </div>
 
-    <div class="tab-content" id="auto">
-      <h2>🛑 Auto Cashout</h2>
-      <label for="multInput">Threshold:</label>
-      <input type="number" id="multInput" min="1.00" max="10.00" step="0.01" value="1.45" />
-      <button id="setCashout">Apply</button>
-      <p id="cashoutStatus">Not set</p>
-    </div>
+  <div class="section">
+    <h2>☁️ Supabase Sync</h2>
+    <div id="syncStatus">--</div>
+    <button id="syncBtn">🔁 Sync Now</button>
+  </div>
 
-    <footer>
-      <p>Made for Honey 🔥 | v2.0 | SkySniper Elite</p>
-    </footer>
+  <div class="section">
+    <h2>🛡️ Backend Status</h2>
+    <div id="backendStatus">--</div>
   </div>
 
   <script type="module" src="popup.js"></script>
