@@ -1,0 +1,47 @@
+// utils/exporter.js — SkySniper Round Data Exporter
+
+import { exportRoundsToCSV, loadRecentRounds } from './dbHandler.js';
+
+/**
+ * Download Aviator round data as a file.
+ *
+ * @param {'csv'|'json'} format  – Desired file format.
+ * @param {number} [limit=500]   – Number of recent rounds to include.
+ */
+export async function downloadRounds(format = 'csv', limit = 500) {
+  let content, mimeType, ext;
+
+  if (format === 'csv') {
+    // Generate CSV string (header + rows)
+    content = await exportRoundsToCSV(limit);
+    mimeType = 'text/csv';
+    ext = 'csv';
+  } else if (format === 'json') {
+    // Load raw round objects and stringify
+    const rounds = await loadRecentRounds(limit);
+    content = JSON.stringify(rounds, null, 2);
+    mimeType = 'application/json';
+    ext = 'json';
+  } else {
+    throw new Error(`Unsupported format: ${format}`);
+  }
+
+  // Build filename with timestamp
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const filename = `sky-sniper-rounds-${timestamp}.${ext}`;
+
+  // Create blob and object URL
+  const blob = new Blob([content], { type: `${mimeType};charset=utf-8;` });
+  const url = URL.createObjectURL(blob);
+
+  // Create temporary anchor to trigger download
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+
+  // Append, click, and clean up
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
