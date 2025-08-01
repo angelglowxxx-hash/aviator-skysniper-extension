@@ -1,1 +1,86 @@
+<!-- SkySniper — adminPanel.html v1.0 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SkySniper Admin Panel</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f0f0f;
+      color: #f0f0f0;
+      padding: 20px;
+    }
+    h1 { color: #00ff99; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 8px;
+      border: 1px solid #444;
+      text-align: center;
+    }
+    th {
+      background-color: #222;
+      color: #00ff99;
+    }
+    .tag-safe { color: #00ff99; }
+    .tag-volatile { color: #ffcc00; }
+    .tag-risky { color: #ff4444; }
+  </style>
+</head>
+<body>
+  <h1>🧠 SkySniper — Synced Rounds</h1>
+  <table id="roundTable">
+    <thead>
+      <tr>
+        <th>Round ID</th>
+        <th>Multiplier</th>
+        <th>Timestamp</th>
+        <th>Tag</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+    const SUPABASE_URL = "https://eipwtuojyimfisucaxnv.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpcHd0dW9qeWltZmlzdWNheG52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQwNTgwNDAsImV4cCI6MjA2OTYzNDA0MH0.xEWYZ7MKpOsTfGUpSZqItqZaylJWqFF1NWk-g8XLkpg";
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function loadRounds() {
+      const { data, error } = await supabase
+        .from('rounds')
+        .select('*')
+        .order('timestamp', { ascending: false })
+        .limit(50);
+
+      if (error) {
+        console.error("❌ Failed to fetch rounds:", error.message);
+        return;
+      }
+
+      const tbody = document.querySelector("#roundTable tbody");
+      tbody.innerHTML = "";
+
+      data.forEach(round => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${round.round_id}</td>
+          <td>${round.crash_multiplier.toFixed(2)}x</td>
+          <td>${new Date(round.timestamp).toLocaleString()}</td>
+          <td class="tag-${round.tag}">${round.tag}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    loadRounds();
+  </script>
+</body>
+</html>
