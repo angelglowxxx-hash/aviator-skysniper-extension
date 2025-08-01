@@ -1,8 +1,7 @@
 // SkySniper — hashVerifier.js v2.0
 
 // 🔐 Online verification via Replit API
-const VERIFY_ENDPOINT = "https://your-replit-hash-api.repl.co/verify";
-
+const VERIFY_ENDPOINT = "https://343c884c-eb55-4d6f-99e6-e2a6f98a076c-00-1luyexkeoryzl.pike.replit.dev/verify";
 // 🧠 Offline SHA256 fallback
 async function computeSHA256(input) {
   const encoder = new TextEncoder();
