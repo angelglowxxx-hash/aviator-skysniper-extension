@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>SkySniper — Control Panel</title>
   <link rel="stylesheet" href="popup.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
 </head>
 <body>
   <div class="popup-container">
@@ -16,6 +16,8 @@
       <button class="tab" data-tab="ai">🤖 AI</button>
       <button class="tab" data-tab="hash">🔐 Hash</button>
       <button class="tab" data-tab="auto">🛑 Auto</button>
+      <button class="tab" data-tab="analytics">📈 Analytics</button>
+      <button class="tab" data-tab="export">💾 Export</button>
     </div>
 
     <div class="tab-content active" id="pattern">
@@ -35,6 +37,41 @@
       <button id="verifyHash">Verify</button>
       <p id="hashStatus">Waiting...</p>
     </div>
+
+    <div class="tab-content" id="auto">
+      <h2>🛑 Auto Cashout</h2>
+      <label for="multInput">Threshold:</label>
+      <input type="number" id="multInput" min="1.00" max="10.00" step="0.01" value="1.45" />
+      <button id="setCashout">Apply</button>
+      <p id="cashoutStatus">Not set</p>
+    </div>
+
+    <div class="tab-content" id="analytics">
+      <h2>📈 Crash Analytics</h2>
+      <div id="analytics-stats">
+        <p>Average: <span id="stat-avg">--</span></p>
+        <p>Median: <span id="stat-med">--</span></p>
+        <p>Std Dev: <span id="stat-std">--</span></p>
+        <p>Volatility: <span id="stat-vol">--</span></p>
+        <p>Anomalies: <span id="stat-anom">--</span></p>
+      </div>
+      <canvas id="histogram" width="280" height="120"></canvas>
+    </div>
+
+    <div class="tab-content" id="export">
+      <h2>💾 Export Data</h2>
+      <button id="exportCsvBtn">Export CSV</button>
+      <button id="exportJsonBtn">Export JSON</button>
+    </div>
+
+    <footer>
+      <p>Made for Honey 🔥 | v2.0 | SkySniper Elite</p>
+    </footer>
+  </div>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>    </div>
 
     <div class="tab-content" id="auto">
       <h2>🛑 Auto Cashout</h2>
