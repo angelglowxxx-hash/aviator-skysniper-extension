@@ -1,7 +1,7 @@
 // SkySniper — hashVerifier.js v3.0
 // 🔐 Sends hash to backend /decode endpoint and returns decoded result
 
-import { config } from './configLoader.js';
+import { config } from './utils/configLoader.js';
 
 export async function verifyHash(hash) {
   if (!hash || typeof hash !== "string") {
