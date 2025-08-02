@@ -1,7 +1,7 @@
-// SkySniper — dbHandler.js v3.0
-// ☁️ Handles local round storage + cloud sync to Supabase
+// SkySniper — dbHandler.js v4.0
+// ☁️ Handles local round storage + cloud sync via backend API
 
-import { saveRoundsBatch } from './dbConnector.js';
+import { config } from './configLoader.js';
 
 let localRounds = [];
 
@@ -17,21 +17,32 @@ export function getLocalRounds() {
   return [...localRounds];
 }
 
-// 🔁 Trigger cloud sync to Supabase
+// 🔁 Trigger cloud sync to backend
 export async function triggerCloudSync() {
   if (localRounds.length === 0) {
     console.log("⚠️ No rounds to sync");
     return false;
   }
 
-  const success = await saveRoundsBatch(localRounds);
+  try {
+    const response = await fetch(config.SYNC_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(localRounds)
+    });
 
-  if (success) {
-    console.log(`✅ Synced ${localRounds.length} rounds to Supabase`);
-    localRounds = []; // Clear after sync
-    return true;
-  } else {
-    console.warn("❌ Cloud sync failed");
+    const result = await response.json();
+
+    if (result.success) {
+      console.log(`✅ Synced ${localRounds.length} rounds to backend`);
+      localRounds = []; // Clear after sync
+      return true;
+    } else {
+      console.warn("❌ Backend sync failed:", result.error);
+      return false;
+    }
+  } catch (err) {
+    console.error("❌ Sync error:", err.message);
     return false;
   }
 }
