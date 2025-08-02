@@ -1,56 +1,54 @@
-// SkySniper — background.js v3.0
-// 🧠 Handles hash capture, decode, AI prediction, Supabase sync
+// SkySniper — background.js v4.0
+// 🧠 Handles round data, AI prediction, backend status, and sync
 
 import { verifyHash } from './utils/hashVerifier.js';
 import { getMultiplierPrediction } from './utils/aiPredictor.js';
-import { addRound, triggerCloudSync } from './utils/dbHandler.js';
+import { triggerCloudSync, getLocalRounds } from './utils/dbHandler.js';
 import { checkBackendStatus } from './utils/statusCheck.js';
 
-// 🔁 Listen for messages from content, popup, or extension
 chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
-  // 🔐 Hash captured from WebSocket
-  if (msg.type === "HASH_CAPTURED" && msg.hash) {
-    console.log("📡 Hash received:", msg.hash);
-
-    const decoded = await verifyHash(msg.hash);
-
-    chrome.runtime.sendMessage({
-      type: "HASH_DECODED",
-      result: decoded,
-      originalHash: msg.hash
-    });
+  if (msg.type === "CHECK_STATUS") {
+    const status = await checkBackendStatus();
+    chrome.runtime.sendMessage({ type: "STATUS_RESULT", status });
   }
 
-  // 🧠 Predict next multiplier using AI
-  if (msg.type === "PREDICT_NEXT" && msg.latestMultiplier) {
-    const prediction = await getMultiplierPrediction(msg.latestMultiplier);
+  if (msg.type === "PREDICT_NEXT") {
+    const result = await getMultiplierPrediction({
+      latestMultiplier: msg.latestMultiplier,
+      pattern: msg.pattern || [],
+      hash: msg.hash || null
+    });
+
+    chrome.runtime.sendMessage({ type: "AI_PREDICTION", payload: result });
+  }
+
+  if (msg.type === "FETCH_LATEST_ROUND") {
+    // Example round data (replace with actual game scraping logic)
+    const roundId = "RD-" + Date.now().toString().slice(-6);
+    const pattern = [1.01, 1.45, 2.00, 1.03];
+    const hash = "abc123hashvalue";
+
+    const decoded = await verifyHash(hash);
+    const prediction = await getMultiplierPrediction({ latestMultiplier: pattern.at(-1), pattern, hash });
+
+    chrome.runtime.sendMessage({
+      type: "ROUND_DATA",
+      payload: {
+        roundId,
+        pattern,
+        hashResult: decoded,
+        safeExit: prediction.prediction,
+      }
+    });
 
     chrome.runtime.sendMessage({
       type: "AI_PREDICTION",
-      prediction
+      payload: prediction
     });
   }
 
-  // 📦 Add round to local buffer
-  if (msg.type === "ROUND_CAPTURED" && msg.round) {
-    addRound(msg.round);
-  }
-
-  // ☁️ Trigger Supabase sync
   if (msg.type === "TRIGGER_CLOUD_SYNC") {
     const success = await triggerCloudSync();
-    chrome.runtime.sendMessage({
-      type: "SYNC_STATUS",
-      success
-    });
-  }
-
-  // 🛡️ Backend health check
-  if (msg.type === "CHECK_STATUS") {
-    const status = await checkBackendStatus();
-    chrome.runtime.sendMessage({
-      type: "STATUS_RESULT",
-      status
-    });
+    chrome.runtime.sendMessage({ type: "SYNC_STATUS", success });
   }
 });
