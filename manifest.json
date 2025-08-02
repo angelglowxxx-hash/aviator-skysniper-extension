@@ -1,23 +1,10 @@
 {
-  "name": "SkySniper Extension",
-  "version": "3.0.0",
   "manifest_version": 3,
-  "description": "Odds96 Aviator hash sniping toolkit",
-  "permissions": [
-    "storage",
-    "scripting",
-    "activeTab"
-  ],
-  "host_permissions": [
-    "https://*/*"
-  ],
-  "action": {
-    "default_popup": "popup.html",
-    "default_icon": {
-      "16": "icons/icon16.png",
-      "48": "icons/icon48.png",
-      "128": "icons/icon128.png"
-    }
+  "name": "SkySniper Extension",
+  "version": "4.0.0",
+  "description": "SkySniper browser extension for Aviator.",
+  "icons": {
+    "128": "icons/icon128.png"
   },
   "background": {
     "service_worker": "background.js",
@@ -28,5 +15,16 @@
       "matches": ["https://odds96.in/*"],
       "js": ["content.js"]
     }
-  ]
+  ],
+  "permissions": [
+    "storage",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://odds96.in/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icons/icon128.png"
+  }
 }
