@@ -1,40 +1,58 @@
-// SkySniper — background.js v4.0
-// 🧠 Handles round data, AI prediction, backend status, and sync
+// background.js 🚀 SkySniper Edition
 
 import { verifyHash } from './utils/hashVerifier.js';
-import { getMultiplierPrediction } from './utils/aiPredictor.js';
-import { triggerCloudSync, getLocalRounds } from './utils/dbHandler.js';
-import { checkBackendStatus } from './utils/statusCheck.js';
 
-chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
-  if (msg.type === "CHECK_STATUS") {
-    const status = await checkBackendStatus();
-    chrome.runtime.sendMessage({ type: "STATUS_RESULT", status });
-  }
+// 🔐 Defensive import fallback
+if (typeof verifyHash !== 'function') {
+  console.warn("[SkySniper] hashVerifier.js failed to load or verifyHash is not a function");
+  chrome.runtime.sendMessage({
+    type: "ERROR",
+    payload: {
+      source: "background.js",
+      message: "verifyHash not loaded",
+      timestamp: new Date().toISOString()
+    }
+  });
+}
 
-  if (msg.type === "PREDICT_NEXT") {
-    const result = await getMultiplierPrediction({
-      latestMultiplier: msg.latestMultiplier,
-      pattern: msg.pattern || [],
-      hash: msg.hash || null
+// 🛠 Message Listener with sendResponse support
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  try {
+    const timestamp = new Date().toISOString();
+
+    // Example: handle a hash verification request
+    if (msg.type === "VERIFY_HASH") {
+      const isValid = verifyHash(msg.payload?.data, msg.payload?.hash);
+      sendResponse({ status: "ok", valid: isValid, timestamp });
+      return true;
+    }
+
+    // Handle other message types here...
+    // e.g., LOG_EVENT, FETCH_CONFIG, etc.
+
+    // Default response
+    sendResponse({ status: "unknown_type", received: msg.type, timestamp });
+    return true;
+
+  } catch (err) {
+    // 🔥 Enhanced error reporting
+    chrome.runtime.sendMessage({
+      type: "ERROR",
+      payload: {
+        source: "background.js",
+        message: err.message,
+        stack: err.stack,
+        timestamp: new Date().toISOString(),
+        context: msg?.type || "unknown"
+      }
     });
 
-    chrome.runtime.sendMessage({ type: "AI_PREDICTION", payload: result });
+    if (sendResponse) {
+      sendResponse({ status: "error", message: err.message });
+    }
+    return true;
   }
-
-  if (msg.type === "FETCH_LATEST_ROUND") {
-    // Example round data (replace with actual game scraping logic)
-    const roundId = "RD-" + Date.now().toString().slice(-6);
-    const pattern = [1.01, 1.45, 2.00, 1.03];
-    const hash = "abc123hashvalue";
-
-    const decoded = await verifyHash(hash);
-    const prediction = await getMultiplierPrediction({ latestMultiplier: pattern.at(-1), pattern, hash });
-
-    chrome.runtime.sendMessage({
-      type: "ROUND_DATA",
-      payload: {
-        roundId,
+});        roundId,
         pattern,
         hashResult: decoded,
         safeExit: prediction.prediction,
