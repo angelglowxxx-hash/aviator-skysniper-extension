@@ -1,10 +1,37 @@
-// background.js 🚀 SkySniper Edition
+// background.js 🚀 SkySniper AI-Connected Edition (Advanced)
 
+// --- Imports --- //
 import { verifyHash } from './utils/hashVerifier.js';
 import { triggerCloudSync } from './utils/dbHandler.js';
 import { getAIPrediction } from './utils/aiPredictor.js';
+import { io } from 'socket.io-client'; // NEW: For backend/AI live sync
 
-// 🔐 Defensive import fallback
+// --- Config --- //
+const BACKEND_URL = "https://skysniper-backend.onrender.com";
+const socket = io(BACKEND_URL, { transports: ["websocket"] });
+
+// --- Utility: AI Auto-Heal via Backend --- //
+async function requestAIAutoFix(errorObj, contextCode = "") {
+  try {
+    const res = await fetch(`${BACKEND_URL}/ai/assist`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        error: errorObj?.message || "Unknown error",
+        context: contextCode || errorObj?.stack || "No context"
+      })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return data.suggestion;
+    }
+    return "AI assist failed";
+  } catch (err) {
+    return `AI assist error: ${err.message}`;
+  }
+}
+
+// --- Defensive import fallback --- //
 if (typeof verifyHash !== 'function') {
   console.warn("[SkySniper] hashVerifier.js failed to load or verifyHash is not a function");
   chrome.runtime.sendMessage({
@@ -17,7 +44,32 @@ if (typeof verifyHash !== 'function') {
   });
 }
 
-// 🛠 Message Listener with sendResponse support
+// --- Socket: Report Extension Events to Dashboard --- //
+function emitExtensionEvent(eventType, payload) {
+  socket.emit("extension_event", {
+    event: eventType,
+    payload,
+    extension: "aviator-skysniper-extension",
+    time: new Date().toISOString()
+  });
+}
+
+// --- Socket: Listen for Backend/AI Commands (e.g. auto-fix) --- //
+socket.on("command", async (cmd) => {
+  if (cmd.action === "UPDATE_CODE") {
+    // For security: ask user or admin before applying any AI patch!
+    // You can show a notification or popup here:
+    chrome.notifications?.create({
+      type: "basic",
+      iconUrl: "icon128.png",
+      title: "AI Code Update Available",
+      message: "AI has generated a code update. Review and apply in extension settings."
+    });
+    // Optionally, store cmd.patch for later review and manual update
+  }
+});
+
+// --- Message Listener (with AI auto-heal, backend sync, and event reporting) --- //
 chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
   try {
     const timestamp = new Date().toISOString();
@@ -25,6 +77,7 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
     // 1️⃣ Hash verification request
     if (msg.type === "VERIFY_HASH") {
       const isValid = verifyHash(msg.payload?.data, msg.payload?.hash);
+      emitExtensionEvent("VERIFY_HASH", { ...msg.payload, isValid });
       sendResponse({ status: "ok", valid: isValid, timestamp });
       return true;
     }
@@ -33,6 +86,7 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
     if (msg.type === "GET_AI_PREDICTION") {
       if (typeof getAIPrediction === 'function') {
         const prediction = await getAIPrediction(msg.payload);
+        emitExtensionEvent("GET_AI_PREDICTION", { input: msg.payload, prediction });
         sendResponse({ status: "ok", prediction, timestamp });
       } else {
         sendResponse({ status: "not_implemented", timestamp });
@@ -44,6 +98,7 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
     if (msg.type === "TRIGGER_CLOUD_SYNC") {
       if (typeof triggerCloudSync === 'function') {
         const success = await triggerCloudSync();
+        emitExtensionEvent("TRIGGER_CLOUD_SYNC", { success });
         sendResponse({ status: "ok", success, timestamp });
       } else {
         sendResponse({ status: "not_implemented", timestamp });
@@ -51,9 +106,9 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
       return true;
     }
 
-    // 4️⃣ Logging events (optional)
+    // 4️⃣ Logging events
     if (msg.type === "LOG_EVENT") {
-      console.log("[SkySniper LOG]", msg.payload);
+      emitExtensionEvent("LOG_EVENT", msg.payload);
       sendResponse({ status: "logged", timestamp });
       return true;
     }
@@ -75,12 +130,24 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
       return true;
     }
 
+    // 6️⃣ Request AI auto-fix/assist for errors (NEW)
+    if (msg.type === "AI_AUTO_FIX") {
+      const suggestion = await requestAIAutoFix(msg.payload.error, msg.payload.contextCode);
+      emitExtensionEvent("AI_AUTO_FIX", { error: msg.payload.error, suggestion });
+      sendResponse({ status: "ok", suggestion, timestamp });
+      return true;
+    }
+
     // Default: Unknown message type
+    emitExtensionEvent("UNKNOWN_TYPE", { msg });
     sendResponse({ status: "unknown_type", received: msg.type, timestamp });
     return true;
 
   } catch (err) {
-    // 🔥 Enhanced error reporting
+    // 🔥 Enhanced error reporting + AI suggestion
+    emitExtensionEvent("ERROR", { message: err.message, stack: err.stack, type: msg?.type || "unknown" });
+    // Optionally, ask AI for help immediately
+    const aiSuggestion = await requestAIAutoFix(err, msg?.type || "");
     chrome.runtime.sendMessage({
       type: "ERROR",
       payload: {
@@ -88,12 +155,12 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
         message: err.message,
         stack: err.stack,
         timestamp: new Date().toISOString(),
-        context: msg?.type || "unknown"
+        context: msg?.type || "unknown",
+        aiSuggestion
       }
     });
-
     if (sendResponse) {
-      sendResponse({ status: "error", message: err.message });
+      sendResponse({ status: "error", message: err.message, aiSuggestion });
     }
     return true;
   }
