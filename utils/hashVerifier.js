@@ -1,16 +1,16 @@
-// SkySniper — hashVerifier.js v3.0
-// 🔐 Sends hash to backend /decode endpoint and returns decoded result
+// SkySniper — hashVerifier.js v4.0
+// 🔐 Sends hash to backend /decode endpoint and returns decoded multiplier
 
-import { config } from './utils/configLoader.js';
+import { config } from './configLoader.js';
 
 export async function verifyHash(hash) {
   if (!hash || typeof hash !== "string") {
-    console.warn("⚠️ Invalid hash input");
+    console.warn("⚠️ Invalid hash input:", hash);
     return "Invalid hash";
   }
 
   try {
-    const res = await fetch(config.DECODE_ENDPOINT, {
+    const response = await fetch(config.DECODE_ENDPOINT, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -18,17 +18,17 @@ export async function verifyHash(hash) {
       body: JSON.stringify({ hash })
     });
 
-    const data = await res.json();
+    const result = await response.json();
 
-    if (data?.decoded !== undefined) {
-      console.log("🔓 Hash decoded:", data.decoded);
-      return data.decoded;
+    if (result?.decoded !== undefined) {
+      console.log("🔓 Hash decoded:", result.decoded);
+      return result.decoded;
     } else {
-      console.warn("⚠️ No decoded value returned:", data);
+      console.warn("⚠️ Unexpected response from backend:", result);
       return "Decode failed";
     }
-  } catch (err) {
-    console.error("❌ Hash verification error:", err.message);
+  } catch (error) {
+    console.error("❌ Backend decode error:", error.message);
     return "Error contacting backend";
   }
 }
