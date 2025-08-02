@@ -1,10 +1,10 @@
-// background.js 🚀 SkySniper AI-Connected Edition (Advanced)
+// background.js 🚀 SkySniper AI-Connected Edition (Advanced, Bundled Required)
 
-// --- Imports --- //
+// --- Imports (these are bundled with Vite/Webpack) --- //
 import { verifyHash } from './utils/hashVerifier.js';
 import { triggerCloudSync } from './utils/dbHandler.js';
 import { getAIPrediction } from './utils/aiPredictor.js';
-import { io } from 'socket.io-client'; // NEW: For backend/AI live sync
+import { io } from 'socket.io-client';
 
 // --- Config --- //
 const BACKEND_URL = "https://skysniper-backend.onrender.com";
@@ -19,7 +19,7 @@ async function requestAIAutoFix(errorObj, contextCode = "") {
       body: JSON.stringify({
         error: errorObj?.message || "Unknown error",
         context: contextCode || errorObj?.stack || "No context"
-      })
+      }),
     });
     if (res.ok) {
       const data = await res.json();
@@ -44,7 +44,7 @@ if (typeof verifyHash !== 'function') {
   });
 }
 
-// --- Socket: Report Extension Events to Dashboard --- //
+// --- Socket: Report Extension Events to Backend/Dashboard --- //
 function emitExtensionEvent(eventType, payload) {
   socket.emit("extension_event", {
     event: eventType,
@@ -58,18 +58,17 @@ function emitExtensionEvent(eventType, payload) {
 socket.on("command", async (cmd) => {
   if (cmd.action === "UPDATE_CODE") {
     // For security: ask user or admin before applying any AI patch!
-    // You can show a notification or popup here:
     chrome.notifications?.create({
       type: "basic",
-      iconUrl: "icon128.png",
+      iconUrl: "icons/icon128.png",
       title: "AI Code Update Available",
       message: "AI has generated a code update. Review and apply in extension settings."
     });
-    // Optionally, store cmd.patch for later review and manual update
+    // Optionally, store cmd.patch for review in extension options page
   }
 });
 
-// --- Message Listener (with AI auto-heal, backend sync, and event reporting) --- //
+// --- Chrome Message Listener --- //
 chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
   try {
     const timestamp = new Date().toISOString();
@@ -115,15 +114,16 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
 
     // 5️⃣ Fetch config (never send secrets to frontend)
     if (msg.type === "FETCH_CONFIG") {
+      // Never expose secrets! Only expose safe config.
       sendResponse({
         status: "ok",
         config: {
-          AI_MODEL_NAME: process.env.AI_MODEL_NAME,
-          AI_MODEL_URL: process.env.AI_MODEL_URL,
-          SYNC_ENDPOINT: process.env.SYNC_ENDPOINT,
-          PREDICT_ENDPOINT: process.env.PREDICT_ENDPOINT,
-          VERIFY_ENDPOINT: process.env.VERIFY_ENDPOINT,
-          DECODE_ENDPOINT: process.env.DECODE_ENDPOINT,
+          AI_MODEL_NAME: process.env?.AI_MODEL_NAME || "OpenRouter",
+          AI_MODEL_URL: process.env?.AI_MODEL_URL || "",
+          SYNC_ENDPOINT: process.env?.SYNC_ENDPOINT || "",
+          PREDICT_ENDPOINT: process.env?.PREDICT_ENDPOINT || "",
+          VERIFY_ENDPOINT: process.env?.VERIFY_ENDPOINT || "",
+          DECODE_ENDPOINT: process.env?.DECODE_ENDPOINT || "",
         },
         timestamp
       });
@@ -165,3 +165,8 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
     return true;
   }
 });
+
+// --- Optional: Service worker keep-alive (for dev) --- //
+setInterval(() => {
+  // No-op ping to keep the service worker alive during development
+}, 60_000);
