@@ -1,6 +1,4 @@
-**Action:** Create `manifest.json` and paste this code into it.
 
-```json
 {
   "manifest_version": 3,
   "name": "SkySniper X",
